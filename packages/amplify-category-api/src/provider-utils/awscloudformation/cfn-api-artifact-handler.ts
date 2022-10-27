@@ -99,7 +99,7 @@ class CfnApiArtifactHandler implements ApiArtifactHandler {
 
     const authConfig = this.extractAuthConfig(appsyncCLIInputs.serviceConfiguration);
 
-    await this.context.amplify.executeProviderUtils(this.context, 'awscloudformation', 'compileSchema', {
+    await this.context.amplify.executeProviderUtils(this.context, 'awscloudformation', '', {
       resourceDir,
       parameters: this.getCfnParameters(serviceConfig.apiName, authConfig, resourceDir),
       authConfig,
@@ -208,7 +208,7 @@ class CfnApiArtifactHandler implements ApiArtifactHandler {
     await generateLambdaIfNew(newConflictResolution.defaultResolutionStrategy);
     await Promise.all(
       (newConflictResolution.perModelResolutionStrategy || [])
-        .map(perModelStrategy => perModelStrategy.resolutionStrategy)
+        .map((perModelStrategy) => perModelStrategy.resolutionStrategy)
         .map(generateLambdaIfNew),
     );
     return newConflictResolution;
@@ -228,7 +228,7 @@ class CfnApiArtifactHandler implements ApiArtifactHandler {
 
   private getCognitoUserPool = (authConfig: AuthConfig): Record<string, unknown> | undefined => {
     const additionalUserPoolProvider = (authConfig.additionalAuthenticationProviders || []).find(
-      aap => aap.authenticationType === 'AMAZON_COGNITO_USER_POOLS',
+      (aap) => aap.authenticationType === 'AMAZON_COGNITO_USER_POOLS',
     );
     const defaultAuth = authConfig.defaultAuthentication;
     if (!(defaultAuth?.authenticationType === 'AMAZON_COGNITO_USER_POOLS') && !additionalUserPoolProvider) {
@@ -369,7 +369,7 @@ const amendDependsOnForAuthConfig = (currentDependsOn: DependsOnEntry[], authCon
 
 const hasCognitoAuthMode = (authConfig: AuthConfig): boolean => (
   authConfig?.defaultAuthentication?.authenticationType === 'AMAZON_COGNITO_USER_POOLS'
-    || authConfig?.additionalAuthenticationProviders?.find(aap => aap.authenticationType === 'AMAZON_COGNITO_USER_POOLS') !== undefined
+    || authConfig?.additionalAuthenticationProviders?.find((aap) => aap.authenticationType === 'AMAZON_COGNITO_USER_POOLS') !== undefined
 );
 
 // returns a new dependsOn array that has a single depends on auth block
@@ -379,7 +379,7 @@ const ensureDependsOnAuth = (currentDependsOn: DependsOnEntry[]): DependsOnEntry
     return [];
   }
   // if dependency already exists, don't add it again
-  if (currentDependsOn.find(dep => dep.category === 'auth' && dep.resourceName === authResourceName)) {
+  if (currentDependsOn.find((dep) => dep.category === 'auth' && dep.resourceName === authResourceName)) {
     return currentDependsOn;
   }
   return currentDependsOn.concat({
@@ -395,7 +395,7 @@ const ensureNoDependsOnAuth = (currentDependsOn: DependsOnEntry[]): DependsOnEnt
   if (!authResourceName) {
     return currentDependsOn;
   }
-  const authIdx = currentDependsOn.findIndex(dep => dep.category === 'auth' && dep.resourceName === authResourceName);
+  const authIdx = currentDependsOn.findIndex((dep) => dep.category === 'auth' && dep.resourceName === authResourceName);
   if (authIdx < 0) {
     return currentDependsOn;
   }
